@@ -1,0 +1,65 @@
+<!-- admin-login.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login - Jocomfort</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff3e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 400px;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #f57c00;
+      color: white;
+      font-weight: bold;
+      border: none;
+    }
+    button:hover {
+      background: #e65100;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Admin Login</h2>
+    <input type="text" id="admin-username" placeholder="Admin Username" />
+    <input type="password" id="admin-password" placeholder="Password" />
+    <button onclick="adminLogin()">Login</button>
+  </div>
+
+  <script>
+    function adminLogin() {
+      const username = document.getElementById("admin-username").value.trim();
+      const password = document.getElementById("admin-password").value.trim();
+
+      if (username === "@@dmin" && password === "p@ssword") {
+        alert("Welcome Admin!");
+        window.location.href = "admin.html";
+      } else {
+        alert("Invalid admin credentials.");
+      }
+    }
+  </script>
+</body>
+</html>

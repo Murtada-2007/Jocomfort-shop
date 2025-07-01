@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cart - Jocomfort</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f0f0;
+      padding: 2rem;
+    }
+    h2 {
+      text-align: center;
+      color: #1e88e5;
+    }
+    .cart-item {
+      background: white;
+      margin: 1rem 0;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .cart-item img {
+      max-width: 80px;
+      border-radius: 6px;
+    }
+    .cart-details {
+      flex: 1;
+      margin-left: 1rem;
+    }
+    .cart-details h4, .cart-details p {
+      margin: 0;
+    }
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    button {
+      padding: 10px 20px;
+      background: #1e88e5;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #1565c0;
+    }
+    .total {
+      text-align: right;
+      font-weight: bold;
+      margin-top: 1rem;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Your Cart</h2>
+  <div id="cart-items"></div>
+  <div class="total" id="total-price">Total: ₦0</div>
+  <div class="actions">
+    <button onclick="goBack()">Continue Shopping</button>
+    <button onclick="shipNow()">Ship Now</button>
+  </div>
+
+  <script>
+    const products = JSON.parse(localStorage.getItem("products")) || [];
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const cartItemsContainer = document.getElementById("cart-items");
+    const totalPriceElement = document.getElementById("total-price");
+
+    function loadCart() {
+      cartItemsContainer.innerHTML = '';
+      let total = 0;
+
+      cart.forEach(id => {
+        const product = products.find(p => p.id === id);
+        if (product) {
+          total += parseFloat(product.price);
+          cartItemsContainer.innerHTML += `
+            <div class="cart-item">
+              <img src="${product.image}" alt="${product.name}">
+              <div class="cart-details">
+                <h4>${product.name}</h4>
+                <p>Price: ₦${Number(product.price).toLocaleString()}</p>
+              </div>
+              <button onclick="removeItem(${id})">Remove</button>
+            </div>
+          `;
+        }
+      });
+
+      totalPriceElement.textContent = "Total: ₦" + total.toLocaleString();
+    }
+
+    function removeItem(id) {
+      const index = cart.indexOf(id);
+      if (index > -1) {
+        cart.splice(index, 1);
+        localStorage.setItem("cart", JSON.stringify(cart));
+        loadCart();
+      }
+    }
+
+    function goBack() {
+      window.location.href = "index.html";
+    }
+
+    function shipNow() {
+      if (cart.length === 0) {
+        alert("Your cart is empty.");
+        return;
+      }
+      alert("Shipping request submitted!");
+      // Optionally clear the cart or implement further logic
+      localStorage.removeItem("cart");
+      window.location.reload();
+    }
+
+    loadCart();
+  </script>
+</body>
+</html>

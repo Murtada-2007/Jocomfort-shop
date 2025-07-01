@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Cart - Murcomfort</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #f0f8ff, #ffffff);
+      padding: 2rem;
+    }
+
+    .cart-container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      color: #1e88e5;
+      margin-bottom: 1rem;
+    }
+
+    .cart-item {
+      border-bottom: 1px solid #ddd;
+      padding: 1rem 0;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .cart-item:last-child {
+      border-bottom: none;
+    }
+
+    .total {
+      font-weight: bold;
+      margin-top: 1.5rem;
+      text-align: right;
+      font-size: 1.2rem;
+    }
+
+    a {
+      display: inline-block;
+      margin-top: 1.5rem;
+      text-decoration: none;
+      color: #fff;
+      background: #1e88e5;
+      padding: 10px 15px;
+      border-radius: 6px;
+    }
+
+    a:hover {
+      background: #1565c0;
+    }
+
+    .empty {
+      text-align: center;
+      margin-top: 2rem;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <div class="cart-container">
+    <h2>Your Shopping Cart</h2>
+    <div id="cart-items"></div>
+    <div class="total" id="total-price">Total: ₦0</div>
+    <a href="index.html">← Back to Shop</a>
+  </div>
+
+  <script>
+    const cartContainer = document.getElementById("cart-items");
+    const totalPriceEl = document.getElementById("total-price");
+    const currentUser = localStorage.getItem("currentUser");
+
+    if (!currentUser) {
+      alert("Please log in to view your cart.");
+      window.location.href = "login.html";
+    }
+
+    const fullCart = JSON.parse(localStorage.getItem("myCarts") || "{}");
+    const userCart = fullCart[currentUser] || [];
+
+    let total = 0;
+
+    if (userCart.length === 0) {
+      cartContainer.innerHTML = '<p class="empty">Your cart is empty.</p>';
+    } else {
+      userCart.forEach(item => {
+        total += item.price;
+
+        const itemDiv = document.createElement("div");
+        itemDiv.className = "cart-item";
+        itemDiv.innerHTML = `
+          <span>${item.name}</span>
+          <span>₦${item.price.toLocaleString()}</span>
+        `;
+        cartContainer.appendChild(itemDiv);
+      });
+
+      totalPriceEl.textContent = `Total: ₦${total.toLocaleString()}`;
+    }
+  </script>
+</body>
+</html>

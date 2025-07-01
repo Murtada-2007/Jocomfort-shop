@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Deposit - Jocomfort</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+      background: #f9f9f9;
+      text-align: center;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      width: 300px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #1e88e5;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1565c0;
+    }
+  </style>
+</head>
+<body>
+  <h2>Deposit Funds</h2>
+  <input type="number" id="amount" placeholder="Enter amount (₦)" disabled /><br>
+  <button onclick="showMessage()">Deposit</button>
+
+  <script>
+    function showMessage() {
+      alert("Deposits are currently unavailable until the promo ends on 30 August. Please check back later.");
+    }
+  </script>
+</body>
+</html>

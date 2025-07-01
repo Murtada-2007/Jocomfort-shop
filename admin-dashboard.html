@@ -1,0 +1,162 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard - Jocomfort</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 2rem;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #1e88e5;
+    }
+    .section {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    input, button, select, textarea {
+      padding: 0.6rem;
+      margin: 0.4rem 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 100%;
+    }
+    button {
+      background: #1e88e5;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #1565c0;
+    }
+    img, video {
+      max-width: 150px;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .product {
+      margin-top: 1rem;
+      padding: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    .logout {
+      text-align: center;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Admin Dashboard</h1>  <div class="section">
+    <h2>Add New Product</h2>
+    <input type="text" id="product-name" placeholder="Product Name" />
+    <input type="number" id="product-price" placeholder="Product Price" />
+    <textarea id="product-desc" placeholder="Product Description"></textarea>
+    <input type="file" id="product-media" accept="image/*,video/*" />
+    <button onclick="addProduct()">Add Product</button>
+  </div>  <div class="section">
+    <h2>All Products</h2>
+    <div id="product-list"></div>
+  </div>  <div class="section">
+    <h2>User Referral Data</h2>
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th style="border: 1px solid #ccc; padding: 8px;">User</th>
+          <th style="border: 1px solid #ccc; padding: 8px;">Referred By</th>
+        </tr>
+      </thead>
+      <tbody id="referral-table"></tbody>
+    </table>
+  </div>  <div class="logout">
+    <button onclick="logoutAdmin()">Logout</button>
+  </div>  <script>
+    let products = JSON.parse(localStorage.getItem("products")) || [];
+
+    function addProduct() {
+      const name = document.getElementById("product-name").value.trim();
+      const price = document.getElementById("product-price").value;
+      const desc = document.getElementById("product-desc").value.trim();
+      const mediaInput = document.getElementById("product-media");
+
+      if (!name || !price || !mediaInput.files.length) {
+        alert("Please fill in all product fields.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function () {
+        const media = reader.result;
+        const type = mediaInput.files[0].type.startsWith("video") ? "video" : "image";
+        const newProduct = { id: Date.now(), name, price, desc, media, type };
+        products.push(newProduct);
+        localStorage.setItem("products", JSON.stringify(products));
+        displayProducts();
+        document.getElementById("product-name").value = '';
+        document.getElementById("product-price").value = '';
+        document.getElementById("product-desc").value = '';
+        mediaInput.value = '';
+      };
+      reader.readAsDataURL(mediaInput.files[0]);
+    }
+
+    function displayProducts() {
+      const list = document.getElementById("product-list");
+      list.innerHTML = "";
+      products.forEach((p) => {
+        list.innerHTML += `
+          <div class="product">
+            <strong>${p.name}</strong>
+            ${p.type === 'image' ? `<img src="${p.media}" alt="${p.name}" />` : `<video controls src="${p.media}"></video>`}
+            <p>₦<input type="number" value="${p.price}" onchange="updatePrice(${p.id}, this.value)" /></p>
+            <p>${p.desc || ''}</p>
+            <button onclick="deleteProduct(${p.id})">Delete</button>
+          </div>
+        `;
+      });
+    }
+
+    function updatePrice(id, newPrice) {
+      const product = products.find(p => p.id === id);
+      if (product) {
+        product.price = newPrice;
+        localStorage.setItem("products", JSON.stringify(products));
+        alert("Price updated!");
+      }
+    }
+
+    function deleteProduct(id) {
+      if (confirm("Are you sure you want to delete this product?")) {
+        products = products.filter(p => p.id !== id);
+        localStorage.setItem("products", JSON.stringify(products));
+        displayProducts();
+      }
+    }
+
+    function loadReferrals() {
+      const data = JSON.parse(localStorage.getItem("referredBy")) || {};
+      const tbody = document.getElementById("referral-table");
+      tbody.innerHTML = "";
+      for (const [user, referrer] of Object.entries(data)) {
+        tbody.innerHTML += `<tr><td style='border: 1px solid #ccc; padding: 8px;'>${user}</td><td style='border: 1px solid #ccc; padding: 8px;'>${referrer}</td></tr>`;
+      }
+    }
+
+    function logoutAdmin() {
+      alert("Admin logged out.");
+      window.location.href = "login.html";
+    }
+
+    // Initial load
+    displayProducts();
+    loadReferrals();
+  </script></body>
+</html>

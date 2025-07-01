@@ -1,0 +1,126 @@
+<!-- Updated index.html (Homepage) --><!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jocomfort - Home</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      color: #333;
+    }
+    header {
+      background: #007bff;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    nav {
+      background: #333;
+      color: white;
+      display: flex;
+      justify-content: space-around;
+      padding: 1rem;
+      flex-wrap: wrap;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border: 1px solid white;
+      border-radius: 6px;
+    }
+    nav a:hover {
+      background: white;
+      color: #333;
+    }
+    .product-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 2rem;
+      justify-content: center;
+    }
+    .product {
+      background: white;
+      padding: 1rem;
+      width: 250px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .product img, .product video {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      margin-bottom: 10px;
+      border-radius: 6px;
+    }
+    .logout {
+      margin-top: 2rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Jocomfort</h1>
+    <p>Welcome, <span id="username">Guest</span></p>
+  </header>
+  <nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="mycart.html">My Cart</a>
+    <a href="deposit.html">Deposit</a>
+  </nav>
+  <div id="product-list" class="product-grid"></div>
+  <div class="logout">
+    <button onclick="logout()">Logout</button>
+  </div>  <script>
+    const loggedInUser = localStorage.getItem("loggedInUser");
+    document.getElementById("username").textContent = loggedInUser || "Guest";
+
+    if (!loggedInUser) {
+      alert("Please login first.");
+      window.location.href = "login.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("loggedInUser");
+      window.location.href = "login.html";
+    }
+
+    const productList = document.getElementById("product-list");
+    const products = JSON.parse(localStorage.getItem("products")) || [];
+
+    if (products.length === 0) {
+      productList.innerHTML = "<p>No products available.</p>";
+    } else {
+      productList.innerHTML = products.map(product => `
+        <div class="product">
+          ${product.image.startsWith("data:video") ? 
+            `<video controls><source src="${product.image}" type="video/mp4"></video>` :
+            `<img src="${product.image}" alt="${product.name}" />`
+          }
+          <h3>${product.name}</h3>
+          <p>₦${product.price}</p>
+          <button onclick="addToCart('${product.name}', ${product.price})">Add to Cart</button>
+        </div>
+      `).join("");
+    }
+
+    function addToCart(name, price) {
+      const allCarts = JSON.parse(localStorage.getItem("myCarts")) || {};
+      const userCart = allCarts[loggedInUser] || [];
+      const existing = userCart.find(i => i.name === name);
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        userCart.push({ name, price, quantity: 1 });
+      }
+      allCarts[loggedInUser] = userCart;
+      localStorage.setItem("myCarts", JSON.stringify(allCarts));
+      alert("Item added to cart.");
+    }
+  </script></body>
+</html>

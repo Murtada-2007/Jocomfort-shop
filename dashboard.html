@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Dashboard - Jocomfort</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f8ff;
+      padding: 1rem;
+      margin: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #007bff;
+      margin-bottom: 1.5rem;
+    }
+    .balance {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-size: 1.2rem;
+    }
+    .section {
+      margin-bottom: 2rem;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 0.5rem 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      padding: 10px 15px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .leaderboard, .referrals {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .leaderboard th, .leaderboard td,
+    .referrals th, .referrals td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    .leaderboard th, .referrals th {
+      background: #f1f1f1;
+    }
+    .footer-btns {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+    }
+    @media (max-width: 500px) {
+      .footer-btns {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Dashboard</h1>
+    <div class="balance">
+      <div><strong>Bonus Balance:</strong> ₦<span id="bonus">0</span></div>
+      <div><strong>Deposited Balance:</strong> ₦<span id="deposit">0</span></div>
+    </div>
+
+    <div class="section">
+      <h3>Your Referral Link</h3>
+      <input type="text" id="ref-link" readonly />
+      <button onclick="copyReferral()">Copy Link</button>
+      <p>You have referred <strong><span id="ref-count">0</span></strong> user(s).</p>
+    </div>
+
+    <div class="section">
+      <h3>Your Referral History</h3>
+      <table class="referrals">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Referred By</th>
+          </tr>
+        </thead>
+        <tbody id="ref-history"></tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h3>Referral Leaderboard</h3>
+      <table class="leaderboard">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Total Referrals</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-body"></tbody>
+      </table>
+    </div>
+
+    <div class="footer-btns">
+      <button onclick="location.href='index.html'">🏠 Home</button>
+      <button onclick="logout()">🚪 Logout</button>
+    </div>
+  </div>
+
+  <script>
+    const user = localStorage.getItem("loggedInUser");
+    if (!user) location.href = "login.html";
+
+    // Balances
+    const bonus = parseInt(localStorage.getItem("bonus_" + user)) || 25000;
+    const referred = JSON.parse(localStorage.getItem("referredBy")) || {};
+    const referredCount = Object.values(referred).filter(ref => ref === user).length;
+    const totalBonus = bonus + referredCount * 1000;
+    document.getElementById("bonus").textContent = totalBonus.toLocaleString();
+
+    const deposit = parseInt(localStorage.getItem("deposit_" + user)) || 0;
+    document.getElementById("deposit").textContent = deposit.toLocaleString();
+
+    // Referral link
+    const refLink = `${location.origin}/register.html?ref=${encodeURIComponent(user)}`;
+    document.getElementById("ref-link").value = refLink;
+    document.getElementById("ref-count").textContent = referredCount;
+
+    // Referral history
+    const refHistory = document.getElementById("ref-history");
+    for (const [uname, ref] of Object.entries(referred)) {
+      if (ref === user) {
+        refHistory.innerHTML += `<tr><td>${uname}</td><td>${ref}</td></tr>`;
+      }
+    }
+
+    // Leaderboard
+    const counts = {};
+    Object.values(referred).forEach(ref => {
+      counts[ref] = (counts[ref] || 0) + 1;
+    });
+    const leaderboard = Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, count]) => `<tr><td>${name}</td><td>${count}</td></tr>`)
+      .join("");
+    document.getElementById("leaderboard-body").innerHTML = leaderboard;
+
+    function copyReferral() {
+      const input = document.getElementById("ref-link");
+      input.select();
+      input.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+      alert("Referral link copied!");
+    }
+
+    function logout() {
+      localStorage.removeItem("loggedInUser");
+      location.href = "login.html";
+    }
+  </script>
+</body>
+</html>
